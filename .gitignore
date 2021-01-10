@@ -1,4 +1,4 @@
 /Apps/wordpress
 /Apps/portainer
 /Apps/database
-/Configs/registry/auth/*
+/Configs/registry/auth/*.*
