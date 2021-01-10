@@ -21,18 +21,25 @@ Values need add (domain optimal you can change to another domain mask):
 - `127.0.0.1 db.wp.net`
 - `127.0.0.1 portainer.wp.net`
 
-2. Create user and password for basic auth in traefik panel using `htpasswd` (apt install apache2-utils)
+2. Create network via command `docker network create web`
+
+3. Create user and password for basic auth in traefik panel using `htpasswd` (apt install apache2-utils)
 
 - input : `htpasswd -nb admin 12345`
 - output : `admin:$apr1$Aqz/agCJ$Pp68dttOMDsEzSi7qp4r30`
 
-3. Add output user/password for basic auth in `Configs/traefik/traefik_dynamic.toml`.
+4. Add output user/password for basic auth in `Configs/traefik/traefik_dynamic.toml`.
 
-4. Update `.env` file values
+5. Update `.env` file values
 
-5. Update `setup.sql` file user/password and database name.
+6. Update `setup.sql` file user/password and database name.
 
-6. Run `docker compose up -d`
+7. Create `registry.password` for Basic Auth in Private docker registry
+
+- create dir auth : `mkdir -p Configs/registry/auth`
+- create **registry.password** via : `htpasswd -Bc registry.password username`
+
+8. Run `docker compose up -d`
 
 - Wordpress path = http://wp.net
 - phpmyadmin path = http://db.wp.net
