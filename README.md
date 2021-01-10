@@ -19,7 +19,7 @@ Values need add (domain optimal you can change to another domain mask):
 - `127.0.0.1 wp.net`
 - `127.0.0.1 monitor.wp.net`
 - `127.0.0.1 db.wp.net`
--`127.0.0.1 portainer.wp.net`
+- `127.0.0.1 portainer.wp.net`
 
 2. Create user and password for basic auth in traefik panel using `htpasswd` (apt install apache2-utils)
 
