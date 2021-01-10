@@ -36,6 +36,24 @@ services:
       - "traefik.http.routers.portainer.rule=Host(`${PORTAINER}`)"  
       - "traefik.http.services.portainer.loadbalancer.server.port=9000"
 
+  # Private Registry
+  registry:
+    image: registry
+    container_name: registry
+    networks: 
+      - web
+    environment: 
+      - REGISTRY_AUTH=htpasswd
+      - REGISTRY_AUTH_HTPASSWD_REALM=Registry
+      - REGISTRY_AUTH_HTPASSWD_PATH=/auth/registry.password
+    volumes: 
+      - ./Configs/registry/auth:/auth
+      - ./Registry:/var/lib/registry
+    labels: 
+      - "traefik.enable=true"
+      - "traefik.http.routers.registry.rule=Host(`${REGISTRY}`)"  
+      - "traefik.http.services.registry.loadbalancer.server.port=5000"
+    restart: always
 
   # Wordpress
   blog:
