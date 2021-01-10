@@ -1,0 +1,89 @@
+version: "3"
+
+networks:
+  web:
+    external: true
+  internal:
+    external: false
+
+services:
+  # Traefik
+  traefik:
+    image: traefik
+    container_name: traefik
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./Configs/traefik/traefik.toml:/traefik.toml
+      - ./Configs/traefik/traefik_dynamic.toml:/traefik_dynamic.toml
+    ports: 
+      - "80:80"
+    networks: 
+      - web
+
+  # Portainer
+  portainer:
+    image: portainer/portainer-ce
+    container_name: portainer
+    restart: unless-stopped
+    networks: 
+      - web
+    volumes: 
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./Apps/portainer:/data
+    labels: 
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`${PORTAINER}`)"  
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+
+
+  # Wordpress
+  blog:
+    image: wordpress:5.6.0-apache
+    container_name: wordpress
+    volumes: 
+      - ./Apps/wordpress:/var/www/html
+    labels:
+      - traefik.http.routers.blog.rule=Host(`${WP_HOME}`)
+      - traefik.port=80
+    environment:
+     - WORDPRESS_DB_HOST=${DB_HOST}
+     - WORDPRESS_DB_NAME=${DB_NAME}
+     - WORDPRESS_TABLE_PREFIX=${DB_PREFIX}
+     - WORDPRESS_DB_USER=${DB_USER}
+     - WORDPRESS_DB_PASSWORD=${DB_PASSWORD}
+    networks:
+      - internal
+      - web
+    depends_on:
+      - mysql
+
+  # MYSQL database
+  mysql:
+    image: mysql:5.7
+    volumes: 
+      - ./setup.sql:/docker-entrypoint-initdb.d/setup.sql
+      - ./Apps/database:/var/lib/mysql:rw
+    environment:
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_ROOT_PASSWORD=${MSQL_PASS_ROOT}
+    ports: 
+      - "127.0.0.1:3306:3306"
+    networks:
+      - internal
+    labels:
+      - traefik.enable=false
+
+  # phpmyadmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    labels:
+      - traefik.http.routers.phpmyadmin.rule=Host(`${PMA}`)
+    environment: 
+        - PMA_ARBITRARY=1
+        - PMA_HOST=mysql
+    networks:
+      - internal
+      - web
+    depends_on:
+      - mysql
