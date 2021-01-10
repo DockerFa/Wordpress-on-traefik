@@ -1,0 +1,10 @@
+[http.middlewares.simpleAuth.basicAuth]
+  users = [
+    "admin:$apr1$wYXKZgbc$GcT.cocANgY1ztrJPj6wX/"
+  ]
+
+[http.routers.api]
+  rule = "Host(`monitor.wp.net`)"
+  entrypoints = ["http"]
+  middlewares = ["simpleAuth"]
+  service = "api@internal"
