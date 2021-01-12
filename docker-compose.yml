@@ -32,9 +32,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./Apps/portainer:/data
     labels: 
-      - "traefik.enable=true"
-      - "traefik.http.routers.portainer.rule=Host(`${PORTAINER}`)"  
-      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - traefik.enable=true
+      - traefik.http.routers.portainer.rule=Host(`${PORTAINER}`)
+      - traefik.http.services.portainer.loadbalancer.server.port=9000
 
   # Private Registry
   registry:
@@ -50,9 +50,9 @@ services:
       - ./Configs/registry/auth:/auth
       - ./Registry:/var/lib/registry
     labels: 
-      - "traefik.enable=true"
-      - "traefik.http.routers.registry.rule=Host(`${REGISTRY}`)"  
-      - "traefik.http.services.registry.loadbalancer.server.port=5000"
+      - traefik.enable=true
+      - traefik.http.routers.registry.rule=Host(`${REGISTRY}`)
+      - traefik.http.services.registry.loadbalancer.server.port=5000
     restart: always
 
   # Wordpress
@@ -66,10 +66,10 @@ services:
       - traefik.port=80
     environment:
      - WORDPRESS_DB_HOST=${DB_HOST}
-     - WORDPRESS_DB_NAME=${DB_NAME}
+     - WORDPRESS_DB_NAME=${MSQL_DB}
      - WORDPRESS_TABLE_PREFIX=${DB_PREFIX}
-     - WORDPRESS_DB_USER=${DB_USER}
-     - WORDPRESS_DB_PASSWORD=${DB_PASSWORD}
+     - WORDPRESS_DB_USER=${MSQL_USR}
+     - WORDPRESS_DB_PASSWORD=${MSQL_PASS}
     networks:
       - internal
       - web
@@ -80,17 +80,24 @@ services:
   mysql:
     image: mysql:5.7
     volumes: 
-      - ./setup.sql:/docker-entrypoint-initdb.d/setup.sql
       - ./Apps/database:/var/lib/mysql:rw
     environment:
-      - MYSQL_DATABASE=${DB_NAME}
       - MYSQL_ROOT_PASSWORD=${MSQL_PASS_ROOT}
+      - MYSQL_USER=${MSQL_USR}
+      - MYSQL_PASSWORD=${MSQL_PASS}
+      - MYSQL_DATABASE=${MSQL_DB}
     ports: 
       - "127.0.0.1:3306:3306"
     networks:
       - internal
     labels:
       - traefik.enable=false
+    healthcheck:
+      test: mysqladmin -u root --password=$MSQL_PASS_ROOT ping
+      interval: 30s
+      retries: 3
+      timeout: 10s
+      start_period: 1m
 
   # phpmyadmin
   phpmyadmin:
