@@ -32,14 +32,12 @@ Values need add (domain optimal you can change to another domain mask):
 
 5. Update `.env` file values
 
-6. Update `setup.sql` file user/password and database name.
-
-7. Create `registry.password` for Basic Auth in Private docker registry
+6. Create `registry.password` for Basic Auth in Private docker registry
 
 - create dir auth : `mkdir -p Configs/registry/auth`
 - create **registry.password** via : `htpasswd -Bc registry.password username`
 
-8. Run `docker compose up -d`
+7. Run `docker compose up -d`
 
 - Wordpress path = http://wp.net
 - phpmyadmin path = http://db.wp.net
