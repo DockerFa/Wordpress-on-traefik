@@ -6,6 +6,7 @@ Run Wordpress with mysql database and portainer docker manager and traefik proxy
 - wordpress
 - mysql
 - portainer
+- registry
 
 ## How to Run on local (Linux)?
 
