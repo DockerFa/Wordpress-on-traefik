@@ -48,7 +48,7 @@ services:
       - REGISTRY_AUTH_HTPASSWD_PATH=/auth/registry.password
     volumes: 
       - ./Configs/registry/auth:/auth
-      - ./Registry:/var/lib/registry
+      - ./Apps/registry:/var/lib/registry
     labels: 
       - traefik.enable=true
       - traefik.http.routers.registry.rule=Host(`${REGISTRY}`)
